@@ -1,7 +1,7 @@
 package com.team.project.tool.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.team.project.tool.model.dto.WriteUserDto;
+import com.team.project.tool.models.dtos.WriteUserDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class CreateUserIntegrationTest {
         String lastName = "User";
         Long id = 1L;
 
-        WriteUserDto writeUserDto = WriteUserDto.builder()
+        WriteUserDTO writeUserDto = WriteUserDTO.builder()
                 .email(email)
                 .firstName(firstName)
                 .lastName(lastName)
