@@ -16,5 +16,4 @@ public interface BoardService {
     void updateBoard(Long id, WriteBoardDTO dto);
 
     void deleteBoard(Long id);
-
 }

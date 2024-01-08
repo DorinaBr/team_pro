@@ -66,5 +66,4 @@ public class BoardServiceImpl implements BoardService {
     public void deleteBoard(Long id) {
         boardRepository.deleteById(id);
     }
-
 }

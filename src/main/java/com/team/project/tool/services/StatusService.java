@@ -9,5 +9,4 @@ public interface StatusService {
     void updateStatus(Long id, WriteStatusDTO dto);
 
     void deleteStatus(Long id);
-
 }
