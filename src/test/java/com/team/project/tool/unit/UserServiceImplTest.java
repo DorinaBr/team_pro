@@ -59,6 +59,7 @@ class UserServiceImplTest {
         ReadUserDTO createdUser = service.createUser(writeUserDTO);
 
         verify(repository, times(1)).save(user);
+        assertEquals(id, createdUser.getId());
         assertEquals(writeUserDTO.getEmail(), createdUser.getEmail());
         assertEquals(writeUserDTO.getLastName(), createdUser.getLastName());
         assertEquals(writeUserDTO.getFirstName(), createdUser.getFirstName());

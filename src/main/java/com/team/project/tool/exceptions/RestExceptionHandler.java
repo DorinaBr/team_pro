@@ -17,7 +17,7 @@ public class RestExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorDTO handleEntityNotFoundException(EntityNotFoundException exception) {
         log.error(exception.getMessage(), exception);
-        return ErrorDTO.builder().message("Resource not found.").build();
+        return ErrorDTO.builder().message(exception.getMessage()).build();
     }
 
     @ExceptionHandler(InvalidInputException.class)
