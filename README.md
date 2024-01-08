@@ -7,6 +7,17 @@ The application was designed for a better organization of team workflows. It can
 
 The application let's you sign up users, create boards, create statuses such as " In progress", "Done", create tasks and assign users to it, in a user friendly manner so that a team can have a better view of their workflow, improving their project efficiency.
 
+
+### Tech Stack
+- Java 17
+- Maven
+- PostgreSQL
+- H2 in-memory database
+- MockMVC
+- Mockito
+- Hibernate
+  
+
 ### How to use
 
 - Access http://localhost:8080/swagger-ui/index.html
