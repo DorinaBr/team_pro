@@ -1,7 +1,7 @@
 # TeamPro - a team project tool
 
 ### Description
-This is an individual project meant to practice and integrate knowledge about REST APIs, SpringBoot, Hibernate, PostgresSQL and testing.
+This is an individual project meant to practice and integrate knowledge about REST APIs, Spring Boot, Hibernate, PostgresSQL and testing.
 
 The application was designed for a better organization of team workflows. It can be used by any team regardless of their field of work.
 
@@ -9,6 +9,7 @@ The application let's you sign up users, create boards, create statuses such as 
 
 
 ### Tech Stack
+- Spring Boot
 - Java 17
 - Maven
 - PostgreSQL
