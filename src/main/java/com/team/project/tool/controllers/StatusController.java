@@ -32,5 +32,4 @@ public class StatusController {
         statusService.deleteStatus(id);
         return ResponseEntity.ok().build();
     }
-
 }

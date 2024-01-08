@@ -23,6 +23,4 @@ public class ReadTaskDTO {
     private Long createdById;
     @NotNull(message = " Date and time must not be null.")
     private LocalDateTime createdAt;
-
-
 }
