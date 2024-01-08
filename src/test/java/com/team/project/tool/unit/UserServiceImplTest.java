@@ -1,6 +1,7 @@
 package com.team.project.tool.unit;
 
 import com.team.project.tool.models.ModelMapper;
+import com.team.project.tool.models.dtos.ReadUserDTO;
 import com.team.project.tool.models.dtos.WriteUserDTO;
 import com.team.project.tool.models.entities.User;
 import com.team.project.tool.repositories.UserRepository;
@@ -34,7 +35,7 @@ class UserServiceImplTest {
         String lastName = "User";
         Long id = 1L;
 
-        WriteUserDTO dto = WriteUserDTO.builder()
+        WriteUserDTO writeUserDTO = WriteUserDTO.builder()
                 .email(email)
                 .firstName(firstName)
                 .lastName(lastName)
@@ -55,10 +56,12 @@ class UserServiceImplTest {
 
         when(repository.save(user)).thenReturn(savedUser);
 
-        Long createdId = service.createUser(dto);
+        ReadUserDTO createdUser = service.createUser(writeUserDTO);
 
         verify(repository, times(1)).save(user);
-        assertEquals(id, createdId);
+        assertEquals(writeUserDTO.getEmail(), createdUser.getEmail());
+        assertEquals(writeUserDTO.getLastName(), createdUser.getLastName());
+        assertEquals(writeUserDTO.getFirstName(), createdUser.getFirstName());
     }
 
     @Test
@@ -67,7 +70,7 @@ class UserServiceImplTest {
 
         when(repository.findById(id)).thenThrow(new EntityNotFoundException());
 
-        assertThrows(EntityNotFoundException.class, () -> service.readUser(id));
+        assertThrows(EntityNotFoundException.class, () -> service.getUser(id));
     }
 
 }

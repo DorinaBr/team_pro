@@ -3,12 +3,9 @@ package com.team.project.tool.controllers;
 import com.team.project.tool.models.dtos.ReadUserDTO;
 import com.team.project.tool.models.dtos.WriteUserDTO;
 import com.team.project.tool.services.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
 
 @RestController
 @RequestMapping("/user")
@@ -18,25 +15,23 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<Void> createUser(HttpServletRequest request, @RequestBody WriteUserDTO writeUserDto) {
-        Long id = userService.createUser(writeUserDto);
-        return ResponseEntity.created(URI.create(request.getRequestURI() + "/" + id)).build();
+    public ResponseEntity<ReadUserDTO> createUser(@RequestBody WriteUserDTO writeUserDto) {
+        return ResponseEntity.ok(userService.createUser(writeUserDto));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReadUserDTO> readUser(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.readUser(id));
+    public ResponseEntity<ReadUserDTO> getUser(@PathVariable Long userId) {
+        return ResponseEntity.ok(userService.getUser(userId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateUser(@PathVariable("id") Long id, @RequestBody WriteUserDTO writeUserDto) {
-        userService.updateUser(id, writeUserDto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ReadUserDTO> updateUser(@PathVariable("id") Long userId, @RequestBody WriteUserDTO writeUserDto) {
+        return ResponseEntity.ok(userService.updateUser(userId, writeUserDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
-        userService.deleteUser(id);
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long userId) {
+        userService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }
 }

@@ -5,11 +5,11 @@ import com.team.project.tool.models.dtos.WriteUserDTO;
 
 public interface UserService {
 
-    Long createUser(WriteUserDTO dto);
+    ReadUserDTO createUser(WriteUserDTO writeUserDTO);
 
-    ReadUserDTO readUser(Long id);
+    ReadUserDTO getUser(Long userId);
 
-    void updateUser(Long id, WriteUserDTO dto);
+    ReadUserDTO updateUser(Long userId, WriteUserDTO writeUserDTO);
 
-    void deleteUser(Long id);
+    void deleteUser(Long userId);
 }

@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface BoardService {
 
-    Long createBoard(WriteBoardDTO dto);
+    ReadBoardDTO createBoard(WriteBoardDTO writeBoardDTO);
 
-    ReadBoardDTO readBoard(Long id);
+    ReadBoardDTO getBoard(Long boardId);
 
-    List<ReadBoardDTO> readAllBoards(Long userId);
+    List<ReadBoardDTO> getAllBoards(Long userId);
 
-    void updateBoard(Long id, WriteBoardDTO dto);
+    ReadBoardDTO updateBoard(Long taskId, WriteBoardDTO writeBoardDTO);
 
-    void deleteBoard(Long id);
+    void deleteBoard(Long boardId);
 }

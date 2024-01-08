@@ -1,5 +1,6 @@
 package com.team.project.tool.controllers;
 
+import com.team.project.tool.models.dtos.ReadStatusDTO;
 import com.team.project.tool.models.dtos.WriteStatusDTO;
 import com.team.project.tool.services.StatusService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,15 +17,13 @@ public class StatusController {
     private final StatusService statusService;
 
     @PostMapping("/board/{boardId}/status")
-    public ResponseEntity<Void> createStatus(@PathVariable("boardId") Long boardId, @RequestBody WriteStatusDTO writeStatusDto, HttpServletRequest request) {
-        Long id = statusService.createStatus(boardId, writeStatusDto);
-        return ResponseEntity.created(URI.create(request.getRequestURI() + "/" + id)).build();
+    public ResponseEntity<ReadStatusDTO> createStatus(@PathVariable("boardId") Long boardId, @RequestBody WriteStatusDTO writeStatusDto) {
+        return ResponseEntity.ok(statusService.createStatus(boardId, writeStatusDto));
     }
 
     @PutMapping("/board/status/{id}")
-    public ResponseEntity<Void> updateStatus(@PathVariable("id") Long id, @RequestBody WriteStatusDTO writeStatusDto){
-        statusService.updateStatus(id, writeStatusDto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ReadStatusDTO> updateStatus(@PathVariable("id") Long id, @RequestBody WriteStatusDTO writeStatusDto){
+        return ResponseEntity.ok(statusService.updateStatus(id, writeStatusDto));
     }
 
     @DeleteMapping("/board/status/{id}")

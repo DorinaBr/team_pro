@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface TaskService {
 
-    Long createTask(Long boardId, WriteTaskDTO dto);
+    ReadTaskDTO createTask(Long boardId, WriteTaskDTO writeTaskDTO);
 
-    ReadTaskDTO readTask(Long id);
+    ReadTaskDTO getTask(Long taskId);
 
-    List<ReadTaskDTO> readAllTasks(Long boardId, Long userId, String titlePart, String descriptionPart, Long statusId, Long createdById);
+    List<ReadTaskDTO> getAllTasks(Long boardId, Long userId, String titlePart, String descriptionPart, Long statusId, Long createdById);
 
-    void updateTask(Long id, WriteTaskDTO dto);
+    ReadTaskDTO updateTask(Long taskId, WriteTaskDTO writeTaskDTO);
 
-    void delete(Long id);
+    void delete(Long taskId);
 }

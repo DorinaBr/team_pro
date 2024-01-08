@@ -1,12 +1,13 @@
 package com.team.project.tool.services;
 
+import com.team.project.tool.models.dtos.ReadStatusDTO;
 import com.team.project.tool.models.dtos.WriteStatusDTO;
 
 public interface StatusService {
 
-    Long createStatus(Long boardId, WriteStatusDTO dto);
+    ReadStatusDTO createStatus(Long boardId, WriteStatusDTO writeStatusDTO);
 
-    void updateStatus(Long id, WriteStatusDTO dto);
+    ReadStatusDTO updateStatus(Long statusId, WriteStatusDTO writeStatusDTO);
 
-    void deleteStatus(Long id);
+    void deleteStatus(Long statusId);
 }

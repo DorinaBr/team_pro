@@ -1,5 +1,9 @@
 package com.team.project.tool.services;
 
+import com.team.project.tool.exceptions.BoardNotFoundException;
+import com.team.project.tool.exceptions.StatusNotFoundException;
+import com.team.project.tool.exceptions.TaskNotFoundException;
+import com.team.project.tool.exceptions.UserNotFoundException;
 import com.team.project.tool.models.ModelMapper;
 import com.team.project.tool.models.dtos.ReadTaskDTO;
 import com.team.project.tool.models.dtos.WriteTaskDTO;
@@ -32,34 +36,34 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public Long createTask(Long boardId, WriteTaskDTO writeTaskDto) {
-        if (writeTaskDto.getUserIds() == null) writeTaskDto.setUserIds(emptyList());
+    public ReadTaskDTO createTask(Long boardId, WriteTaskDTO writeTaskDTO) {
+        if (writeTaskDTO.getUserIds() == null) writeTaskDTO.setUserIds(emptyList());
 
-        Task task = modelMapper.writeTaskDtoToEntity(writeTaskDto);
+        Task task = modelMapper.writeTaskDtoToEntity(writeTaskDTO);
 
         task.setCreatedAt(LocalDateTime.now());
-        task.setCreatedBy(userRepository.findById(writeTaskDto.getCreatedById()).orElseThrow(EntityNotFoundException::new));
-        task.setBoard(boardRepository.findById(boardId).orElseThrow(EntityNotFoundException::new));
-        task.setStatus(statusRepository.findById(writeTaskDto.getStatusId()).orElseThrow(EntityNotFoundException::new));
-        task.setUsers(writeTaskDto.getUserIds().stream().map(userRepository::findById).map(optional -> optional.orElseThrow(EntityNotFoundException::new)).toList());
+        task.setCreatedBy(userRepository.findById(writeTaskDTO.getCreatedById()).orElseThrow(UserNotFoundException::new));
+        task.setBoard(boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new));
+        task.setStatus(statusRepository.findById(writeTaskDTO.getStatusId()).orElseThrow(StatusNotFoundException::new));
+        task.setUsers(writeTaskDTO.getUserIds().stream().map(userRepository::findById).map(optional -> optional.orElseThrow(UserNotFoundException::new)).toList());
 
-        return modelMapper.taskEntityToReadDto(taskRepository.save(task)).getId();
+        return modelMapper.taskEntityToReadDto(taskRepository.save(task));
     }
 
     @Override
-    public ReadTaskDTO readTask(Long id) {
-        return modelMapper.taskEntityToReadDto(taskRepository.findById(id).orElseThrow(EntityNotFoundException::new));
+    public ReadTaskDTO getTask(Long taskId) {
+        return modelMapper.taskEntityToReadDto(taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new));
     }
 
     @Override
-    public List<ReadTaskDTO> readAllTasks(Long boardId, Long userId, String titlePart, String descriptionPart, Long statusId, Long createdById) {
+    public List<ReadTaskDTO> getAllTasks(Long boardId, Long userId, String titlePart, String descriptionPart, Long statusId, Long createdById) {
         Specification<Task> specification = Specification.where(null);
 
         if (boardId != null) {
-            taskSpecifications.isOnBoard(boardRepository.findById(boardId).orElseThrow(EntityNotFoundException::new));
+            taskSpecifications.isOnBoard(boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new));
         }
         if (userId != null) {
-            taskSpecifications.hasUser(userRepository.findById(userId).orElseThrow(EntityNotFoundException::new));
+            taskSpecifications.hasUser(userRepository.findById(userId).orElseThrow(UserNotFoundException::new));
         }
         if (titlePart != null) {
             taskSpecifications.titleContains(titlePart);
@@ -68,10 +72,10 @@ public class TaskServiceImpl implements TaskService {
             taskSpecifications.descriptionContains(descriptionPart);
         }
         if (statusId != null) {
-            taskSpecifications.hasStatus(statusRepository.findById(statusId).orElseThrow(EntityNotFoundException::new));
+            taskSpecifications.hasStatus(statusRepository.findById(statusId).orElseThrow(StatusNotFoundException::new));
         }
         if (createdById != null) {
-            taskSpecifications.isCreatedBy(userRepository.findById(createdById).orElseThrow(EntityNotFoundException::new));
+            taskSpecifications.isCreatedBy(userRepository.findById(createdById).orElseThrow(UserNotFoundException::new));
         }
 
         return modelMapper.taskEntitiesToReadDtos(taskRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt")));
@@ -79,27 +83,29 @@ public class TaskServiceImpl implements TaskService {
 
     @Transactional
     @Override
-    public void updateTask(Long id, WriteTaskDTO writeTaskDto) {
-        if (writeTaskDto.getUserIds() == null) writeTaskDto.setUserIds(emptyList());
+    public ReadTaskDTO updateTask(Long taskId, WriteTaskDTO writeTaskDTO) {
+        if (writeTaskDTO.getUserIds() == null) writeTaskDTO.setUserIds(emptyList());
 
-        Task task = taskRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        Task task = taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
 
-        task.setTitle(writeTaskDto.getTitle());
-        task.setDescription(writeTaskDto.getDescription());
+        task.setTitle(writeTaskDTO.getTitle());
+        task.setDescription(writeTaskDTO.getDescription());
 
-        if (!task.getStatus().getId().equals(writeTaskDto.getStatusId())) {
-            task.setStatus(statusRepository.findById(writeTaskDto.getStatusId()).orElseThrow(EntityNotFoundException::new));
+        if (!task.getStatus().getId().equals(writeTaskDTO.getStatusId())) {
+            task.setStatus(statusRepository.findById(writeTaskDTO.getStatusId()).orElseThrow(StatusNotFoundException::new));
         }
-        if (!task.getUsers().stream().map(User::getId).sorted().toList().equals(writeTaskDto.getUserIds().stream().sorted().toList())) {
-            task.setUsers(new ArrayList<>(writeTaskDto.getUserIds().stream().map(userRepository::findById).map(optional -> optional.orElseThrow(EntityNotFoundException::new)).toList()));
+        if (!task.getUsers().stream().map(User::getId).sorted().toList().equals(writeTaskDTO.getUserIds().stream().sorted().toList())) {
+            task.setUsers(new ArrayList<>(writeTaskDTO.getUserIds().stream().map(userRepository::findById).map(optional -> optional.orElseThrow(UserNotFoundException::new)).toList()));
         }
 
-        taskRepository.save(task);
+        return modelMapper.taskEntityToReadDto(taskRepository.save(task));
     }
 
     @Transactional
     @Override
-    public void delete(Long id) {
-        taskRepository.deleteById(id);
+    public void delete(Long taskId) {
+        taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+
+        taskRepository.deleteById(taskId);
     }
 }

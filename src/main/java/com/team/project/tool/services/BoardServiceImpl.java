@@ -1,5 +1,7 @@
 package com.team.project.tool.services;
 
+import com.team.project.tool.exceptions.BoardNotFoundException;
+import com.team.project.tool.exceptions.UserNotFoundException;
 import com.team.project.tool.models.ModelMapper;
 import com.team.project.tool.models.dtos.ReadBoardDTO;
 import com.team.project.tool.models.dtos.WriteBoardDTO;
@@ -7,7 +9,6 @@ import com.team.project.tool.models.entities.Board;
 import com.team.project.tool.models.entities.User;
 import com.team.project.tool.repositories.BoardRepository;
 import com.team.project.tool.repositories.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,23 +27,23 @@ public class BoardServiceImpl implements BoardService {
 
     @Transactional
     @Override
-    public Long createBoard(WriteBoardDTO writeBoardDto) {
-        Board board = modelMapper.writeBoardDtoToEntity(writeBoardDto);
+    public ReadBoardDTO createBoard(WriteBoardDTO writeBoardDTO) {
+        Board board = modelMapper.writeBoardDtoToEntity(writeBoardDTO);
 
-        board.setOwner(userRepository.findById(writeBoardDto.getOwnerId()).orElseThrow(EntityNotFoundException::new));
+        board.setOwner(userRepository.findById(writeBoardDTO.getOwnerId()).orElseThrow(UserNotFoundException::new));
 
-        return modelMapper.boardEntityToReadDto(boardRepository.save(board)).getId();
+        return modelMapper.boardEntityToReadDto(boardRepository.save(board));
     }
 
     @Override
-    public ReadBoardDTO readBoard(Long id) {
-        return modelMapper.boardEntityToReadDto(boardRepository.findById(id).orElseThrow(EntityNotFoundException::new));
+    public ReadBoardDTO getBoard(Long boardId) {
+        return modelMapper.boardEntityToReadDto(boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new));
     }
 
     @Override
-    public List<ReadBoardDTO> readAllBoards(Long userId) {
+    public List<ReadBoardDTO> getAllBoards(Long userId) {
         Set<Board> boardEntities = new HashSet<>();
-        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         boardEntities.addAll(user.getBoards());
         boardEntities.addAll(user.getOwnedBoards());
@@ -52,18 +53,20 @@ public class BoardServiceImpl implements BoardService {
 
     @Transactional
     @Override
-    public void updateBoard(Long id, WriteBoardDTO writeBoardDto) {
-        Board board = boardRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public ReadBoardDTO updateBoard(Long taskId, WriteBoardDTO writeBoardDTO) {
+        Board board = boardRepository.findById(taskId).orElseThrow(BoardNotFoundException::new);
 
-        board.setName(writeBoardDto.getName());
-        board.setOwner(userRepository.findById(writeBoardDto.getOwnerId()).orElseThrow(EntityNotFoundException::new));
+        board.setName(writeBoardDTO.getName());
+        board.setOwner(userRepository.findById(writeBoardDTO.getOwnerId()).orElseThrow(UserNotFoundException::new));
 
-        boardRepository.save(board);
+        return modelMapper.boardEntityToReadDto(boardRepository.save(board));
     }
 
     @Transactional
     @Override
-    public void deleteBoard(Long id) {
-        boardRepository.deleteById(id);
+    public void deleteBoard(Long boardId) {
+        boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new);
+
+        boardRepository.deleteById(boardId);
     }
 }
