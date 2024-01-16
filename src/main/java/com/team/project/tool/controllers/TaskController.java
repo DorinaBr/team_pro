@@ -21,9 +21,9 @@ public class TaskController {
         return ResponseEntity.ok(taskService.createTask(boardId, writeTaskDto));
     }
 
-    @GetMapping("/board/task/{id}")
-    public ResponseEntity<ReadTaskDTO> getTask(@PathVariable Long id) {
-        return ResponseEntity.ok(taskService.getTask(id));
+    @GetMapping("/board/task/{taskId}")
+    public ResponseEntity<ReadTaskDTO> getTask(@PathVariable Long taskId) {
+        return ResponseEntity.ok(taskService.getTask(taskId));
     }
 
     @GetMapping("/board/tasks")
@@ -36,15 +36,15 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getAllTasks(boardId, userId, titlePart, descriptionPart, statusId, createdById));
     }
 
-    @PutMapping("/board/task/{id}")
-    public ResponseEntity<ReadTaskDTO> updateTask(@PathVariable("id") Long taskId, @RequestBody WriteTaskDTO writeTaskDto) {
+    @PutMapping("/board/task/{taskId}")
+    public ResponseEntity<ReadTaskDTO> updateTask(@PathVariable Long taskId, @RequestBody WriteTaskDTO writeTaskDto) {
         return ResponseEntity.ok(taskService.updateTask(taskId, writeTaskDto));
     }
 
-    @DeleteMapping("/board/task/{id}")
+    @DeleteMapping("/board/task/{taskId}")
     @Transactional
-    public ResponseEntity<Void> deleteTask(@PathVariable("id") Long id) {
-        taskService.delete(id);
+    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
+        taskService.delete(taskId);
         return ResponseEntity.ok().build();
     }
 }

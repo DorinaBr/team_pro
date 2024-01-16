@@ -10,8 +10,9 @@ import com.team.project.tool.models.dtos.WriteStatusDTO;
 import com.team.project.tool.models.entities.Status;
 import com.team.project.tool.repositories.BoardRepository;
 import com.team.project.tool.repositories.StatusRepository;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,15 +31,7 @@ public class StatusServiceImpl implements StatusService {
         status.setPosition(statusRepository.findMaxPosition(boardId).orElse(0) + 1);
         status.setBoard(boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new));
 
-        try {
-            return modelMapper.statusEntityToReadDto(statusRepository.save(status));
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("duplicate key value violates unique constraint")) {
-                throw new DuplicateStatusNameException(e);
-            } else {
-                throw e;
-            }
-        }
+        return modelMapper.statusEntityToReadDto(statusRepository.save(status));
     }
 
     @Transactional
@@ -48,12 +41,11 @@ public class StatusServiceImpl implements StatusService {
         status.setName(writeStatusDTO.getName());
 
         if (writeStatusDTO.getPosition() != null && !writeStatusDTO.getPosition().equals(status.getPosition())) {
-            Integer currentPosition = status.getPosition();
             status.setPosition(writeStatusDTO.getPosition());
 
             Status statusToSwitchPositionWith = status.getBoard().getStatuses().stream()
                     .filter(e -> e.getPosition().equals(writeStatusDTO.getPosition())).findFirst().orElseThrow(InvalidPositionException::new);
-            statusToSwitchPositionWith.setPosition(currentPosition);
+            statusToSwitchPositionWith.setPosition(status.getPosition());
             statusRepository.save(statusToSwitchPositionWith);
         }
         return modelMapper.statusEntityToReadDto(statusRepository.save(status));

@@ -19,18 +19,18 @@ public class UserController {
         return ResponseEntity.ok(userService.createUser(writeUserDto));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{userId}")
     public ResponseEntity<ReadUserDTO> getUser(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getUser(userId));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ReadUserDTO> updateUser(@PathVariable("id") Long userId, @RequestBody WriteUserDTO writeUserDto) {
+    @PutMapping("/{userId}")
+    public ResponseEntity<ReadUserDTO> updateUser(@PathVariable Long userId, @RequestBody WriteUserDTO writeUserDto) {
         return ResponseEntity.ok(userService.updateUser(userId, writeUserDto));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long userId) {
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();
     }

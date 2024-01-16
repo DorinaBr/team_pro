@@ -21,9 +21,9 @@ public class BoardController {
         return ResponseEntity.ok(boardService.createBoard(writeBoardDto));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ReadBoardDTO> getBoard(@PathVariable Long id) {
-        return ResponseEntity.ok(boardService.getBoard(id));
+    @GetMapping("/{boardId}")
+    public ResponseEntity<ReadBoardDTO> getBoard(@PathVariable Long boardId) {
+        return ResponseEntity.ok(boardService.getBoard(boardId));
     }
 
     @GetMapping("s")
@@ -31,14 +31,14 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getAllBoards(userId));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ReadBoardDTO> updateBoard(@PathVariable("id") Long id, @RequestBody WriteBoardDTO writeBoardDto) {
-        return ResponseEntity.ok(boardService.updateBoard(id, writeBoardDto));
+    @PutMapping("/{boardId}")
+    public ResponseEntity<ReadBoardDTO> updateBoard(@PathVariable Long boardId, @RequestBody WriteBoardDTO writeBoardDto) {
+        return ResponseEntity.ok(boardService.updateBoard(boardId, writeBoardDto));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBoard(@PathVariable("id") Long id) {
-        boardService.deleteBoard(id);
+    @DeleteMapping("/{boardId}")
+    public ResponseEntity<Void> deleteBoard(@PathVariable Long boardId) {
+        boardService.deleteBoard(boardId);
         return ResponseEntity.ok().build();
     }
 }
