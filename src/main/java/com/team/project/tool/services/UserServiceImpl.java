@@ -6,13 +6,14 @@ import com.team.project.tool.models.dtos.ReadUserDTO;
 import com.team.project.tool.models.dtos.WriteUserDTO;
 import com.team.project.tool.models.entities.User;
 import com.team.project.tool.repositories.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Slf4j
 @RequiredArgsConstructor
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -21,12 +22,18 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public ReadUserDTO createUser(WriteUserDTO writeUserDTO) {
-        return modelMapper.userEntityToReadDto(userRepository.save(modelMapper.writeUserDtoToEntity(writeUserDTO)));
+        User savedUser = userRepository.save(modelMapper.writeUserDtoToEntity(writeUserDTO));
+        log.info("Saved User with id {}, in the database.", savedUser.getId());
+
+        return modelMapper.userEntityToReadDto(savedUser);
     }
 
     @Override
     public ReadUserDTO getUser(Long userId) {
-        return modelMapper.userEntityToReadDto(userRepository.findById(userId).orElseThrow(UserNotFoundException::new));
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        log.info("Found User with id {}, in the database.", userId);
+
+        return modelMapper.userEntityToReadDto(user);
     }
 
     @Transactional
@@ -38,7 +45,10 @@ public class UserServiceImpl implements UserService {
         user.setLastName(writeUserDTO.getLastName());
         user.setEmail(writeUserDTO.getEmail());
 
-        return modelMapper.userEntityToReadDto(userRepository.save(user));
+        User updatedUser = userRepository.save(user);
+        log.info("Updated User with id {}, in the database.", userId);
+
+        return modelMapper.userEntityToReadDto(updatedUser);
     }
 
     @Transactional
@@ -47,5 +57,7 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         userRepository.deleteById(userId);
+
+        log.info("Deleted User with id {}, from the database.", userId);
     }
 }

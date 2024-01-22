@@ -1,7 +1,6 @@
 package com.team.project.tool.services;
 
 import com.team.project.tool.exceptions.BoardNotFoundException;
-import com.team.project.tool.exceptions.DuplicateStatusNameException;
 import com.team.project.tool.exceptions.InvalidPositionException;
 import com.team.project.tool.exceptions.StatusNotFoundException;
 import com.team.project.tool.models.ModelMapper;
@@ -10,14 +9,14 @@ import com.team.project.tool.models.dtos.WriteStatusDTO;
 import com.team.project.tool.models.entities.Status;
 import com.team.project.tool.repositories.BoardRepository;
 import com.team.project.tool.repositories.StatusRepository;
-import jakarta.persistence.PersistenceException;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.exception.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Slf4j
 @RequiredArgsConstructor
+@Service
 public class StatusServiceImpl implements StatusService {
 
     private final StatusRepository statusRepository;
@@ -31,7 +30,10 @@ public class StatusServiceImpl implements StatusService {
         status.setPosition(statusRepository.findMaxPosition(boardId).orElse(0) + 1);
         status.setBoard(boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new));
 
-        return modelMapper.statusEntityToReadDto(statusRepository.save(status));
+        Status savedStatus = statusRepository.save(status);
+        log.info("Saved Status with id {}, in the database.", savedStatus.getId());
+
+        return modelMapper.statusEntityToReadDto(savedStatus);
     }
 
     @Transactional
@@ -47,8 +49,13 @@ public class StatusServiceImpl implements StatusService {
                     .filter(e -> e.getPosition().equals(writeStatusDTO.getPosition())).findFirst().orElseThrow(InvalidPositionException::new);
             statusToSwitchPositionWith.setPosition(status.getPosition());
             statusRepository.save(statusToSwitchPositionWith);
+            log.info("Updated Status with id {}, in the database.", statusToSwitchPositionWith.getId());
         }
-        return modelMapper.statusEntityToReadDto(statusRepository.save(status));
+
+        Status savedStatus = statusRepository.save(status);
+        log.info("Updated Status with id {}, in the database.", statusId);
+
+        return modelMapper.statusEntityToReadDto(savedStatus);
     }
 
     @Transactional
@@ -57,5 +64,7 @@ public class StatusServiceImpl implements StatusService {
         statusRepository.findById(statusId).orElseThrow(StatusNotFoundException::new);
 
         statusRepository.deleteById(statusId);
+
+        log.info("Deleted Status with id {}, from the database.", statusId);
     }
 }

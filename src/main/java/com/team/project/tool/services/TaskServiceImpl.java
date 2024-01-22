@@ -12,6 +12,7 @@ import com.team.project.tool.models.entities.User;
 import com.team.project.tool.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,9 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 
-@Service
+@Slf4j
 @RequiredArgsConstructor
+@Service
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
@@ -47,12 +49,18 @@ public class TaskServiceImpl implements TaskService {
         task.setStatus(statusRepository.findById(writeTaskDTO.getStatusId()).orElseThrow(StatusNotFoundException::new));
         task.setUsers(writeTaskDTO.getUserIds().stream().map(userRepository::findById).map(optional -> optional.orElseThrow(UserNotFoundException::new)).toList());
 
-        return modelMapper.taskEntityToReadDto(taskRepository.save(task));
+        Task savedTask = taskRepository.save(task);
+        log.info("Saved Task with id {}, in the database.", savedTask.getId());
+
+        return modelMapper.taskEntityToReadDto(savedTask);
     }
 
     @Override
     public ReadTaskDTO getTask(Long taskId) {
-        return modelMapper.taskEntityToReadDto(taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new));
+        Task task = taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
+        log.info("Found Task with id {}, in the database.", taskId);
+
+        return modelMapper.taskEntityToReadDto(task);
     }
 
     @Override
@@ -78,7 +86,10 @@ public class TaskServiceImpl implements TaskService {
             taskSpecifications.isCreatedBy(userRepository.findById(createdById).orElseThrow(UserNotFoundException::new));
         }
 
-        return modelMapper.taskEntitiesToReadDtos(taskRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt")));
+        List<Task> tasks = taskRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt"));
+        log.info("Found {} Tasks in the database.", tasks.size());
+
+        return modelMapper.taskEntitiesToReadDtos(tasks);
     }
 
     @Transactional
@@ -98,7 +109,10 @@ public class TaskServiceImpl implements TaskService {
             task.setUsers(new ArrayList<>(writeTaskDTO.getUserIds().stream().map(userRepository::findById).map(optional -> optional.orElseThrow(UserNotFoundException::new)).toList()));
         }
 
-        return modelMapper.taskEntityToReadDto(taskRepository.save(task));
+        Task updatedTask = taskRepository.save(task);
+        log.info("Updated Task with id {}, in the database.", taskId);
+
+        return modelMapper.taskEntityToReadDto(updatedTask);
     }
 
     @Transactional
@@ -107,5 +121,7 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.findById(taskId).orElseThrow(TaskNotFoundException::new);
 
         taskRepository.deleteById(taskId);
+
+        log.info("Deleted Task with id {}, from the database.", taskId);
     }
 }
