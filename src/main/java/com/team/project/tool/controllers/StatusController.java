@@ -18,6 +18,8 @@ public class StatusController {
 
     @PostMapping("/{boardId}/status")
     public ResponseEntity<ReadStatusDTO> createStatus(@PathVariable("boardId") Long boardId, @RequestBody WriteStatusDTO writeStatusDto) {
+        // This exception is thrown only after the service method returns, when trying to commit the transaction,
+        // hence the placement of this try catch block in the controller.
         try {
             return ResponseEntity.ok(statusService.createStatus(boardId, writeStatusDto));
         } catch (DataIntegrityViolationException e) {

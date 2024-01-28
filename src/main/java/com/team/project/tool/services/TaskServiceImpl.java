@@ -10,11 +10,8 @@ import com.team.project.tool.models.dtos.WriteTaskDTO;
 import com.team.project.tool.models.entities.Task;
 import com.team.project.tool.models.entities.User;
 import com.team.project.tool.repositories.*;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,11 +27,11 @@ import static java.util.Collections.emptyList;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+    private final FilterTaskRepository filterTaskRepository;
     private final StatusRepository statusRepository;
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
     private final ModelMapper modelMapper;
-    private final TaskSpecifications taskSpecifications;
 
     @Transactional
     @Override
@@ -65,28 +62,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<ReadTaskDTO> getAllTasks(Long boardId, Long userId, String titlePart, String descriptionPart, Long statusId, Long createdById) {
-        Specification<Task> specification = Specification.where(null);
-
-        if (boardId != null) {
-            taskSpecifications.isOnBoard(boardRepository.findById(boardId).orElseThrow(BoardNotFoundException::new));
-        }
-        if (userId != null) {
-            taskSpecifications.hasUser(userRepository.findById(userId).orElseThrow(UserNotFoundException::new));
-        }
-        if (titlePart != null) {
-            taskSpecifications.titleContains(titlePart);
-        }
-        if (descriptionPart != null) {
-            taskSpecifications.descriptionContains(descriptionPart);
-        }
-        if (statusId != null) {
-            taskSpecifications.hasStatus(statusRepository.findById(statusId).orElseThrow(StatusNotFoundException::new));
-        }
-        if (createdById != null) {
-            taskSpecifications.isCreatedBy(userRepository.findById(createdById).orElseThrow(UserNotFoundException::new));
-        }
-
-        List<Task> tasks = taskRepository.findAll(specification, Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<Task> tasks = filterTaskRepository.findFilteredTasks(boardId, userId, titlePart, descriptionPart, statusId, createdById);
         log.info("Found {} Tasks in the database.", tasks.size());
 
         return modelMapper.taskEntitiesToReadDtos(tasks);

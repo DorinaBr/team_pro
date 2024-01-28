@@ -1,5 +1,6 @@
 package com.team.project.tool.models.dtos;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -18,6 +19,6 @@ public class ReadUserDTO {
     @Size(min = 2, message = "Last name must be at least 2 characters long.")
     private String lastName;
     @NotNull(message = "Email address must not be null.")
-    @Pattern(regexp = ".+@.+\\..+", message = "Email address must contain '@' and '.'.")
+    @Email
     private String email;
 }
